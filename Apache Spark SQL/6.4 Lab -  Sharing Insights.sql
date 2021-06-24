@@ -93,7 +93,7 @@ SELECT
   device_type AS deviceType,
   signal,
   temps,
-  to_date(timestamp, 'yyyy/MM/dd HH:MM:SS') AS timeStamp
+  to_date(timestamp, 'yyyy/MM/dd HH:MM:SS') AS time
 FROM
   Lab_6_4_Table
 
@@ -101,10 +101,6 @@ FROM
 -- COMMAND ----------
 
 DESCRIBE EXTENDED DCDevices
-
--- COMMAND ----------
-
-
 
 -- COMMAND ----------
 
@@ -121,7 +117,12 @@ DESCRIBE EXTENDED DCDevices
 
 -- COMMAND ----------
 
---TODO
+SELECT
+  batteryLevel,
+  deviceId,
+  EXISTS (batteryLevel, bl -> bl < 0) needService
+FROM DCDevices
+ORDER BY deviceId,batteryLevel;
 
 -- COMMAND ----------
 
@@ -142,7 +143,10 @@ DESCRIBE EXTENDED DCDevices
 
 -- COMMAND ----------
 
---TODO
+SELECT CO2Level, 
+      FILTER(CO2Level, lvl -> lvl > 1400) highCO2
+      FROM DCDevices
+
 
 -- COMMAND ----------
 
