@@ -93,7 +93,7 @@ SELECT
   device_type AS deviceType,
   signal,
   temps,
-  to_date(timestamp, 'yyyy/MM/dd HH:MM:SS') AS time
+  cast(from_unixtime(unix_timestamp(timestamp,'yyyy/MM/dd HH:mm:ss')) AS timestamp) AS time
 FROM
   Lab_6_4_Table
 
@@ -101,6 +101,10 @@ FROM
 -- COMMAND ----------
 
 DESCRIBE EXTENDED DCDevices
+
+-- COMMAND ----------
+
+SELECT * FROM DCDevices
 
 -- COMMAND ----------
 
@@ -143,10 +147,23 @@ ORDER BY deviceId,batteryLevel;
 
 -- COMMAND ----------
 
-SELECT CO2Level, 
-      FILTER(CO2Level, lvl -> lvl > 1400) highCO2
-      FROM DCDevices
+WITH temp_table AS
+(SELECT 
+  deviceId,
+  deviceType,
+  CO2Level,
+  EXISTS(CO2Level, lvl -> lvl > 1400) highCO2,
+  time
+FROM DCDevices)
 
+SELECT * FROM temp_table
+WHERE highCO2=='TRUE'
+ORDER BY deviceID,CO2Level
+
+
+-- COMMAND ----------
+
+DESCRIBE temp_table
 
 -- COMMAND ----------
 
