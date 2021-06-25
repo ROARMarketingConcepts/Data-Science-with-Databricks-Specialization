@@ -156,14 +156,28 @@ WITH temp_table AS
   time
 FROM DCDevices)
 
-SELECT * FROM temp_table
+SELECT 
+EXPLODE(CO2Level)
+FROM temp_table
 WHERE highCO2=='TRUE'
-ORDER BY deviceID,CO2Level
+ORDER BY col DESC
+
 
 
 -- COMMAND ----------
 
-DESCRIBE temp_table
+WITH temp_table AS
+(SELECT 
+  deviceId,
+  deviceType,
+  CO2Level,
+  EXISTS(CO2Level, lvl -> lvl > 1400) highCO2,
+  time
+FROM DCDevices)
+
+SELECT * FROM temp_table
+WHERE highCO2=='TRUE'
+ORDER BY deviceID,CO2Level;
 
 -- COMMAND ----------
 
@@ -182,7 +196,23 @@ DESCRIBE temp_table
 
 -- COMMAND ----------
 
---TODO
+CREATE TABLE IF NOT EXISTS partitioned_table
+PARTITIONED BY (device_id)
+AS
+  SELECT
+    battery_level,
+    co2_level,
+    device_type,
+    signal,
+    temps,
+    timestamp,
+    p_device_id
+  FROM Lab_6_4_Table;
+  
+SELECT * FROM partitioned_table;
+
+
+
 
 -- COMMAND ----------
 
